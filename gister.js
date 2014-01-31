@@ -177,7 +177,7 @@
      */
     this.observe = function(selector) {
       if(!observer) throw new Error("Your browser doesn't support 'MutationObserver'.");
-      else observer.observe(d.querySelector(selector), { childList: true});
+      else observer.observe(d.querySelector(selector), { childList: true });
     };
 
     /**
@@ -195,22 +195,19 @@
           start = new Date().getTime(),
           timer = undefined;
 
-      console.log('Starting DOM polling ...');
       (function recurse() {
         var elapsed = (new Date().getTime()) - start;
 
         if(elapsed >= 8 * 1000) { // Only poll the DOM for 8 seconds, no more.
-          console.log('Polling timed out.');
           clearTimeout(timer);
         } else if(node.querySelectorAll(gistSelector).length) {
-          console.log('Stopping DOM polling.');
           clearTimeout(timer);
           mutationCallback(null);
         } else {
-          console.log('Polling recurse.');
           timer = setTimeout(recurse, 500); // Poll the DOM twice a second.
         }
       }());
+      
     };
 
   };
