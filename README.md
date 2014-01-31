@@ -1,4 +1,4 @@
-# Gister: Embed GitHub Gists Dynamically
+## Gister: Embed GitHub Gists Dynamically
 
 GitHub's embed ```<script>``` for your hosted Gist only works if it's part of the DOM before your browser's ```window``` has fired its ```onload``` event. Many current websites load the bulk of their content  *after* the ```onload``` event has fired, thus Gister.
 
@@ -12,7 +12,7 @@ Even with the Promise polyfill, Gister is only supported by modern browsers, and
  * http://caniuse.com/mutationobserver
  * http://caniuse.com/promises
 
-## How To Load Gister
+### How To Load Gister
 
 Gister can be loaded as an AMD module or a traditional ```<script>``` tag.
 
@@ -40,7 +40,7 @@ define([
 <script src="http://s3.amazonaws.com/es6-promises/promise-0.1.1.min.js"></script>
 <script src="/path/to/local/gister.js"></script>
 ```
-## How to Use Gister
+### How to Use Gister
 
 Gister requires your dynamic content to contain ```<code>``` elements (with an HTML5 ```data-*``` attribute) where you want your Gist to appear. For example:
 
@@ -54,11 +54,11 @@ Gister requires your dynamic content to contain ```<code>``` elements (with an H
 ```
 Once thats in place, use the **Gister API** to embed your Gists after your application has loaded the dynamic content.
 
-## Gister API
+### Gister API
 
 The Gister API is a constructor and set of public methods for a Gister object. Gister uses MutationObserver internally so the API has a similiar syntax and behavior.  The first step is to always construct a Gister object:
 
-### ```Gister(dataAttrName, [callback])``` 
+#### ```Gister(dataAttrName, [callback])``` 
 
 Creates a new instance of Gister.
 
@@ -66,20 +66,20 @@ Creates a new instance of Gister.
 
 ```callback``` is an optional function to execute for each Gist *after* it has been embedded into the parent ```<code>``` element. The ```callback``` will be passed a reference to the Gist's parent ```<code>``` element.
 
-### ```observe(selector)```
+#### ```observe(selector)```
 
 Uses MutationObserver to observe a DOM node for changes. This is how you tell Gister to embed Gists into your dynamic content.
 
 ```selector``` is a CSS style selector targeting the DOM node that will contain the dynamic content. The node that ```selector``` targets must be present in the DOM prior to loading the dynamic content. It can be as general as targeting the ```<body>```element.
 
 
-### ```poll(selector)```
+#### ```poll(selector)```
 
 If you don't want to use MutationObserver, or your browser doesn't support it, you can use ```poll``` to poll the DOM for changes to the element targeted by ```selector```. ```poll``` only polls the DOM for 8 seconds, so you should use it right before fetching your dynamic content.
 
 ```selector``` is a CSS style selector targeting the DOM node that will contain the dynamic content. The node that ```selector``` targets must be present in the DOM prior to loading the dynamic content. It can be as general as targeting the ```<body>```element.
 
-## Example Usage
+### Example Usage
 
 ```javascript
 // The important thing is to observe() or poll() BEFORE fetching the dynamic content.
