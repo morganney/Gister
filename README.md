@@ -82,19 +82,27 @@ If you don't want to use MutationObserver, or your browser doesn't support it, y
 ### Example Usage
 
 ```javascript
-// The important thing is to observe() or poll() BEFORE fetching the dynamic content.
-
+/*
+ * In this example the dynamic content is loaded into an element with 
+ * an id attribute of 'post-container', and the Gists are embedded into
+ * the following elements:
+ *
+ *  <code data-gist-id="public_gist_id"></code>
+ *
+ * The important thing is to observe() or poll() BEFORE fetching the dynamic
+ * content which contains the <code> elements.
+ */
 if(window.MutationObserver && window.Promise) {
   // Should work with modern browsers and IE9+.
   new Gister('gist-id').observe('#post-container');
   // Or, to remove a CSS class after the Gist has been embedded.
   new Gister('gist-id', function(el) {$(el).removeClass('loading');}).observe('#post-container');
-  // Now fetch the dynamic content and insert it into the DOM node targeted by #post-container.
+  // Now fetch the content and insert it into the DOM node targeted by #post-container.
 } else if(window.Promise) {
   // You can use poll() where MutationObserver isn't supported.
   new Gister('gist-id').poll('#post-container');
-  // Now fetch the dynamic content and insert it into the DOM node targeted by #post-container.
+  // Now fetch the content and insert it into the DOM node targeted by #post-container.
 } else {
-  // You probably shouldn't use Gister to load your Gists.
+  // You probably shouldn't use Gister (as-is) to load your Gists.
 }
 ```
