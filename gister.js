@@ -9,9 +9,9 @@
  * cater to Internet Explorer's inabilities, and only supports the latest versions
  * of modern browsers that implement the MutationObserver and Promise API's.
  *
- ******************************************************************************************
- *  This basically means that only Chrome 32+ is supported by default (as of 1/28/2014).  *
- ******************************************************************************************
+ *********************************************************************************************
+ *  This basically means that only Chrome 32+ supports Gister by default (as of 1/28/2014).  *
+ *********************************************************************************************
  *
  * By adding the suggested Promise polyfill, the script can support
  * Chrome 18+, Firefox 14+, Safari 6+, Opera 15+, and IE 11+.
