@@ -19,8 +19,7 @@ Gister can be loaded as an AMD module or a traditional ```<script>``` tag.
 #### As an AMD Module
  ```javascript
 /*
- * Some module definition that assumes /path/to/local/gister.js
- * is directly under the baseUrl property in the RequireJS configuration.
+ * Some module definition that has Gister as a dependency.
  * 
  * NOTE: A Promise polyfill must be loaded prior to the module executing.
  * Most likely you've handled this dependency in the RequireJS configuration,
