@@ -50,12 +50,13 @@
         // Convert hyphens "-" into camelCase.
         dataSetName = dataAttrName.replace(/-([a-z])/g, function (g) {return g[1].toUpperCase();}),
         addGistCss = function(filename) {
-          var link = d.createElement('link');
+          var link = d.createElement('link'),
+							fn   = filename.indexOf('http') > -1 ? filename : 'https://gist-assets.github.com' + filename;
 
           link.type = 'text/css';
           link.rel = 'stylesheet';
           link.media = 'all';
-          link.href = 'https://gist.github.com' + filename;
+          link.href = fn;
 
           d.getElementsByTagName('head')[0].appendChild(link);
           // Only need to append the CSS stylesheet once.
