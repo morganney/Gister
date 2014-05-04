@@ -1,11 +1,16 @@
-## Gister: Embed GitHub Gists Dynamically
+## Gister: GitHub Gist Embedding
 
-GitHub's embed ```<script>``` for your hosted Gist only works if it's part of the DOM before your browser's ```window``` has fired its ```onload``` event. Many current websites load the bulk of their content  *after* the ```onload``` event has fired, thus Gister.
+Gister allows you to embed GitHub Gists into your websites static and dynamic HTML content. Just place ```<code data-*="[public gist id]"></code>``` elements in your HTML where you want the Gist to be placed.
 
-If you need to support a browser other than Chrome 32+ (chances are you do), then Gister **requires
-a Promise polyfill**: https://github.com/jakearchibald/ES6-Promises
+See [How To Load Gister](how-to-load-gister) and the [Gister API](gister-api) for details. There is also a [TL;DR](tldr-example) example.
 
-Even with the Promise polyfill, Gister is only supported by modern browsers, and IE 11+. Specificially, Gister works with Chrome 18+, Firefox 14+, Safari 6+, Opera 15+, and IE 11+. If you use a MutationObserver polyfill, Gister can run on IE 9+.
+Supported Browsers: Chrome 32+ (I know, shocking)
+
+However, with the recommended [ES6 Promise polyfill](https://github.com/jakearchibald/ES6-Promises), Gister works with
+all modern browsers. Specifically, Chrome 18+, Firefox 14+, Safari 6+, Opera 15+, and IE 11+.
+
+If you are only using Gister with static content, use a MutationObserver polyfill, or only use ```poll()```'ing, then
+Internet Explorer support can be extended to IE 9+. 
 
 **For mobile browser support see**:
 
@@ -26,33 +31,44 @@ Gister can be loaded as an AMD module or a traditional ```<script>``` tag.
  * or you just load the polyfill globally with a <script> tag.
  */
 define([
-  'depA',
-  'gister',
-  'depB'
-], function(A, Gister, B) {
-   // Define the module using Gister as needed.
+  '...', // Just implies other dependencies, not to be confused with ES6 (Harmony) spread
+  'promise',
+  'gister'
+], function(..., Promise, Gister) {
+   
+   ...
+   
+   // If using Gister with dynamic content
+   new Gister('gist-id').observe('body');
+   // If using Gister with static content
+   new Gister('gist-id').fetch();
+
 });
 ```
 #### As an HTML &lt;script&gt; Tag (creates a global window.Gister)
 
-```html 
+```html
 <script src="http://s3.amazonaws.com/es6-promises/promise-0.1.1.min.js"></script>
-<script src="/path/to/local/gister.js"></script>
+<script src="gister.js"></script>
+<!-- 
+   if using Gister with static content and you want to put public GitHub Gists 
+   in <code data-gist-id='[public gist id]'></code> elements. 
+   Load Gister like this:
+-->
+<script src="gister.js" data-attrName="gist-id"></script>
+<!-- This results in the following code: new Gister('gist-id').fetch(); -->
 ```
 ### How to Use Gister
 
-Gister requires your dynamic content to contain ```<code>``` elements (with an HTML5 ```data-*``` attribute) where you want your Gist to appear. For example:
+Gister requires your HTML content to contain ```<code>``` elements (with an HTML5 ```data-*``` attribute) where you want your Gist(s) to appear. For example:
 
 ```html
-<p>Some amazing dynamic HTML content ... blah blah ...</p>
-
-<!-- "gistId" can be any value: "gist-id", "foo-bar", etc. -->
-<code data-gistId="{your public gist id}"></code>
-
-<p>Blah blah ...</p>
+<!-- NOTE: "gist-id" can be any value you want, this is just one example -->
+<p> ... lorem ipsum ... </p>
+<code data-gist-id="{your public gist id}"></code>
+<p> ... blah blah ... </p>
 ```
-Once thats in place, use the **Gister API** to embed your Gists after your application has loaded the dynamic content.
-
+Once thats in place, use the **Gister API** to embed your Gists into your content's ```<code data-gist-id="123"></code>``` elements, or if it's static content load Gister like this: ```<script src="gister.js" data-attrName="gist-id"></script>```.
 ### Gister API
 
 The Gister API is a constructor and set of public methods for a Gister object. Gister uses MutationObserver internally so the API has a similiar syntax and behavior.  The first step is to always construct a Gister object:
@@ -78,7 +94,7 @@ If you don't want to use MutationObserver, or your browser doesn't support it, y
 
 ```selector``` is a CSS style selector targeting the DOM node that will contain the dynamic content. The node that ```selector``` targets must be present in the DOM prior to loading the dynamic content. It can be as general as targeting the ```<body>```element.
 
-### Example Usage
+### TL;DR Example
 
 ```javascript
 /*
