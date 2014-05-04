@@ -3,7 +3,11 @@
  * It can be loaded as an AMD module or inline script element.
  *
  * Gister embeds gist content into HTML5 code elements with a data-* attribute:
- * E.g.: <code data-publicGistId='12345'>.
+ * <code data-publicGistId='12345'>
+ *
+ * Gister also works without MutationObservers on static content if loaded via an inline
+ * script tag using a data-attrName attribute:
+ * <script data-attrName='foobar' src='gister.js'></script> (updates) <code data-foobar='[public gist id]'></code>
  *
  * WARNING: This script isn't cross-browser in any way. In particular, it doesn't
  * cater to Internet Explorer's inabilities, and only supports the latest versions
@@ -23,12 +27,21 @@
  *
  * Recommended Promises polyfill: @see https://github.com/jakearchibald/ES6-Promises
  */
-(function(root, modef) {
+(function(root, modef, undefined) {
+
+  var inlineScript = undefined;
 
   if(typeof define === 'function' && define.amd) {
     define(modef); // AMD
   } else {
     root.Gister = modef(); // <script>
+
+    // If inline <script> contains a data-attrName attribute, then create Gister with the provided
+    // value and update content immediately bypassing MutationObservers.
+    inlineScript = document.querySelector('script[src*="gister"');
+    if(inlineScript && inlineScript.dataset.attrName) {
+      new root.Gister(inlineScript.dataset.attrName).fetch();
+    }
   }
 
 }(this, function() {
@@ -42,45 +55,45 @@
    * @param {String:dataAttrName(req)} The name of the gist's parent node's data attribute. Required.
    * @param {Function:callback} Optional callback to be called after each gist is embedded.
    */
-  var	Gister = function(dataAttrName, callback) {// e.g. <p data-foo-bar='baz'> dataAttrName == "foo-bar"
+  var	Gister = function(dataAttrName, callback) {
 
     // Private properties and/or methods.
     var w = window, d = document, me = this,
-        gistSelector = ['code[data-', dataAttrName, ']'].join(''),
-        // Convert hyphens "-" into camelCase.
-        dataSetName = dataAttrName.replace(/-([a-z])/g, function (g) {return g[1].toUpperCase();}),
-        addGistCss = function(filename) {
-          var link = d.createElement('link'),
-							fn   = filename.indexOf('http') > -1 ? filename : 'https://gist-assets.github.com' + filename;
+      gistSelector = ['code[data-', dataAttrName, ']'].join(''),
+      // Convert hyphens "-" into camelCase.
+      dataSetName = dataAttrName.replace(/-([a-z])/g, function(l) {return l[1].toUpperCase();}),
+      addGistCss = function(filename) {
+        var link = d.createElement('link'),
+          fn   = filename.indexOf('http') > -1 ? filename : 'https://gist-assets.github.com' + filename;
 
-          link.type = 'text/css';
-          link.rel = 'stylesheet';
-          link.media = 'all';
-          link.href = fn;
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+        link.media = 'all';
+        link.href = fn;
 
-          d.getElementsByTagName('head')[0].appendChild(link);
-          // Only need to append the CSS stylesheet once.
-          addGistCss = function() {};
-        },
-        mutationCallback = function(mutations) {
-          // Convert NodeList into an Array of Nodes. Older versions of IE throw and error here.
-          Array.prototype.slice.call(d.querySelectorAll(gistSelector)).forEach(function(el) {
-            fetch(el.dataset[dataSetName]).then(function(gist) {
-              addGistCss(gist.stylesheet);
-              el.innerHTML = gist.div;
-              el.className = el.className + ' gisterComplete';
-            }).catch(function(error) {
-              el.className = el.className + ' gisterError';
-              el.innerHTML = error.message;
-            }).then(function() {
-              // Always execute a user supplied callback. Usually for adding/removing CSS styles.
-              if(callback && typeof callback === 'function') callback(el);
-            });
+        d.getElementsByTagName('head')[0].appendChild(link);
+        // Only need to append the CSS stylesheet once.
+        addGistCss = function() {};
+      },
+      mutationCallback = function(mutations) {
+        // Convert NodeList into an Array of Nodes. Older versions of IE throw and error here.
+        Array.prototype.slice.call(d.querySelectorAll(gistSelector)).forEach(function(el) {
+          fetch(el.dataset[dataSetName]).then(function(gist) {
+            addGistCss(gist.stylesheet);
+            el.innerHTML = gist.div;
+            el.className = el.className + ' gisterComplete';
+          }).catch(function(error) {
+            el.className = el.className + ' gisterError';
+            el.innerHTML = error.message;
+          }).then(function() {
+            // Always execute a user supplied callback. Usually for adding/removing CSS styles.
+            if(callback && typeof callback === 'function') callback(el);
           });
-          // Just listen once.
-          observer.disconnect();
-        },
-        observer = w.MutationObserver ? new MutationObserver(mutationCallback) : undefined;
+        });
+        // Just listen once.
+        observer.disconnect();
+      },
+      observer = w.MutationObserver ? new MutationObserver(mutationCallback) : undefined;
 
     /**
      * Private function for fetching a GitHub gist. Uses JSONP because gists.github.com
@@ -94,15 +107,15 @@
     function fetch(id) {
       return new Promise(function(resolve, reject) {
         var s = d.createElement('script'),
-            first = d.getElementsByTagName('script')[0],
-            callbackName = '_f_gist' + id,
-            gistName = '_p_gist' + id,
-            overwritten = typeof w[callbackName] !== 'undefined' ? true : false,
-            preserved = w[callbackName],
-            cleanup = function() {
-              if(overwritten) w[callbackName] = preserved;
-              else delete w[callbackName];
-            };
+          first = d.getElementsByTagName('script')[0],
+          callbackName = '_f_gist' + id,
+          gistName = '_p_gist' + id,
+          overwritten = typeof w[callbackName] !== 'undefined' ? true : false,
+          preserved = w[callbackName],
+          cleanup = function() {
+            if(overwritten) w[callbackName] = preserved;
+            else delete w[callbackName];
+          };
 
         /**
          * The inserted script's JSONP callback. Attach it to global scope before appending script.
@@ -136,7 +149,7 @@
 
         /**
          * Add a timeout in case GitHub is busy or some other unknown network issue is afoot.
-         * Rejects the promise if GitHub takes 8 seconds to respond.
+         * Rejects the promise if GitHub takes 10 seconds to respond.
          *
          * Once a Promise is fulfilled or rejected, it will NEVER change its state again, so
          * rejecting after some set time won't overwrite any previous fulfillment or rejection.
@@ -144,7 +157,7 @@
         setTimeout(function() {
           reject(new Error('The request to GitHub has timed out.'));
           // Bypass cleanup() to avoid any runtime errors from a missing function reference.
-        }, 8000);
+        }, 10000);
 
         // Add the <script> to the DOM
         first.parentNode.insertBefore(s, first);
@@ -186,20 +199,20 @@
      * This is a fallback for browser's with Promise support but no MutationObserver support.
      * Really only useful for slightly older versions of IE.
      *
-     * Will only poll the DOM for 8 seconds, so call this method at around the time
+     * Will only poll the DOM for 10 seconds, so call this method at around the time
      * you expect the DOM to change.
      *
      * @param {String:selector} A Selectors API (Level 2) string identifying the gists parent node in the DOM.
      */
     this.poll = function(selector) {
       var node = document.querySelector(selector),
-          start = new Date().getTime(),
-          timer = undefined;
+        start = new Date().getTime(),
+        timer = undefined;
 
       (function recurse() {
         var elapsed = (new Date().getTime()) - start;
 
-        if(elapsed >= 8 * 1000) { // Only poll the DOM for 8 seconds, no more.
+        if(elapsed >= 10 * 1000) { // Only poll the DOM for 10 seconds, no more.
           clearTimeout(timer);
         } else if(node.querySelectorAll(gistSelector).length) {
           clearTimeout(timer);
@@ -208,7 +221,15 @@
           timer = setTimeout(recurse, 500); // Poll the DOM twice a second.
         }
       }());
-      
+
+    };
+
+    /**
+     * Wrapper for Gister's private mutationCallback handler.
+     * Allows Gister to be used without MutationObservers for static content.
+     */
+    this.fetch = function() {
+      mutationCallback();
     };
 
   };
