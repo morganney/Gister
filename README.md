@@ -1,16 +1,19 @@
 ## Gister: GitHub Gist Embedding
 
-Gister allows you to embed GitHub Gists into your websites static and dynamic HTML content. Just place ```<code data-*="[public gist id]"></code>``` elements in your HTML where you want the Gist to be placed.
+Gister allows you to embed GitHub Gists into your websites static and dynamic HTML content. 
 
-See [How To Load Gister](how-to-load-gister) and the [Gister API](gister-api) for details. There is also a [TL;DR](tldr-example) example.
+ * [How To Load Gister](#how-to-load-gister)
+ * [How To Use Gister](#how-to-use-gister)
+ * [Gister API](#gister-api)
+ * [TL;DR](#tldr-example)
 
-Supported Browsers: Chrome 32+ (I know, shocking)
+**Browser Support**
 
-However, with the recommended [ES6 Promise polyfill](https://github.com/jakearchibald/ES6-Promises), Gister works with
-all modern browsers. Specifically, Chrome 18+, Firefox 14+, Safari 6+, Opera 15+, and IE 11+.
+Chrome 32+
 
-If you are only using Gister with static content, use a MutationObserver polyfill, or only use ```poll()```'ing, then
-Internet Explorer support can be extended to IE 9+. 
+However, with the recommended [ES6 Promise polyfill](https://github.com/jakearchibald/ES6-Promises), browser support can be extended to: Chrome 18+, Firefox 14+, Safari 6+, Opera 15+, and IE 11+.
+
+*If you are only using Gister with static content, are using a MutationObserver polyfill, or only use [```poll()```](#pollselector)'ing, then Internet Explorer support can be extended to IE 9+*. 
 
 **For mobile browser support see**:
 
@@ -95,7 +98,18 @@ If you don't want to use MutationObserver, or your browser doesn't support it, y
 ```selector``` is a CSS style selector targeting the DOM node that will contain the dynamic content. The node that ```selector``` targets must be present in the DOM prior to loading the dynamic content. It can be as general as targeting the ```<body>```element.
 
 ### TL;DR Example
+If using Gister with static content, just use an inline ```<script>```, or ```fetch()```:
 
+```html
+<!-- Assuming you want to place the Gists in the following elements: <code data-gist-id={YOUR GIST ID}></code> -->
+<script src='gister.js' data-attrName='gist-id'></script>
+```
+
+```javascript
+  new Gister('gist-id').fetch();
+```
+
+If using the Gister API (for example on dynamic content):
 ```javascript
 /*
  * In this example the dynamic content is loaded into an element with 
