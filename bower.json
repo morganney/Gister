@@ -1,0 +1,37 @@
+{
+  "name": "Gister",
+  "version": "0.0.1",
+  "homepage": "https://github.com/morganney/Gister",
+  "authors": [
+    "Morgan Ney <morganney@gmail.com>"
+  ],
+  "description": "Gister embeds GitHub Gists into HTML",
+  "main": "gister.js",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "github",
+    "gist",
+    "gists",
+    "embed"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "es6-promise": "*"
+  },
+  "devDependencies": {
+    "jquery": "~2.1.1",
+    "mocha": "~1.19.0",
+    "requirejs": "~2.1.11",
+    "should": "~3.3.1"
+  }
+}
