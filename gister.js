@@ -58,7 +58,7 @@
 
     // Check for Promise support. Gister requires ES6 Promises.
     if(!window.Promise) {
-      throw new Error("Failed to construct 'Gister': Your browser doesn't support 'Promise'.");
+      throw new Error("Failed to construct 'Gister': 'Promise' is not defined.");
     }
 
     // Enforce constructor invocation.
