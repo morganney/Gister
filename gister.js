@@ -36,8 +36,7 @@
   } else {
     root.Gister = modef(); // <script>
 
-    // If inline <script> contains a data-attrName attribute, then create Gister with the provided
-    // value and update content immediately bypassing MutationObservers.
+    // If <script data-attrName> used, bypass MutationObserver API and update DOM immediately.
     inlineScript = document.querySelector('script[src*="gister"');
     if(inlineScript && inlineScript.dataset.attrName) {
       new root.Gister(inlineScript.dataset.attrName).fetch();
@@ -57,6 +56,21 @@
    */
   var	Gister = function(dataAttrName, callback) {
 
+    // Check for Promise support. Gister requires ES6 Promises.
+    if(!window.Promise) {
+      throw new Error("Failed to construct 'Gister': Your browser doesn't support 'Promise'.");
+    }
+
+    // Enforce constructor invocation.
+    if(!(this instanceof Gister)) {
+      throw new TypeError("Failed to construct 'Gister': Use the 'new' operator.");
+    }
+
+    // Enforce parameter requirement.
+    if(!dataAttrName) {
+      throw new Error("Failed to construct 'Gister': Provide a data attr. name for the gist container(s).");
+    }
+
     // Private properties and/or methods.
     var w = window, d = document, me = this,
       gistSelector = ['code[data-', dataAttrName, ']'].join(''),
@@ -75,7 +89,7 @@
         // Only need to append the CSS stylesheet once.
         addGistCss = function() {};
       },
-      mutationCallback = function(mutations) {
+      mutationCallback = function() {
         // Convert NodeList into an Array of Nodes. Older versions of IE throw and error here.
         Array.prototype.slice.call(d.querySelectorAll(gistSelector)).forEach(function(el) {
           fetch(el.dataset[dataSetName]).then(function(gist) {
@@ -162,21 +176,6 @@
         // Add the <script> to the DOM
         first.parentNode.insertBefore(s, first);
       });
-    }
-
-    // Enforce constructor invocation.
-    if(!(this instanceof Gister)) {
-      throw new TypeError("Failed to construct 'Gister': Use the 'new' operator.");
-    }
-
-    // Enforce parameter requirement.
-    if(!dataAttrName) {
-      throw new Error("Failed to construct 'Gister': Provide a data attr. name for the gist container(s).");
-    }
-
-    // Check for Promise support. The use of Promises should be encouraged for async applications.
-    if(!w.Promise) {
-      throw new Error("Failed to construct 'Gister': Your browser doesn't support 'Promise'.");
     }
 
     // Protected properties and/or methods
