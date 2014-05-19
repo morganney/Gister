@@ -22,7 +22,7 @@ require(['gister'], function(Gister) {
     if(typeof Promise === 'function') {
       describe('#Constructor', function() {
 
-        it('Should require ES6 Promises to be available', function() {
+        it('Should check for ES6 Promise support', function() {
           (function() {
             new Gister('test')
           }).should.not.throw();
@@ -42,8 +42,16 @@ require(['gister'], function(Gister) {
 
       });
     } else {
-      it('Should not be tested further without ES6 Promise dependency met', function() {
+      it('Should not be tested further until ES6 Promise dependency met', function() {
         true;
+      });
+
+      describe('#Constructor', function() {
+        it('Should require ES6 Promises to be available', function() {
+          (function() {
+            new Gister('test');
+          }).should.throw(/\'promise\'\ is\ not\ defined/i);
+        });
       });
     }
   });
