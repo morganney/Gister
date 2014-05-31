@@ -1,4 +1,5 @@
 /.idea
 /*.iml
 /.idea_modules
+test/js/lib
 bower_components
