@@ -37,7 +37,7 @@
     root.Gister = modef(); // <script>
 
     // If <script data-attrName> used, bypass MutationObserver API and update DOM immediately.
-    inlineScript = document.querySelector('script[src*="gister"');
+    inlineScript = document.querySelector('script[src*="gister"]');
     if(inlineScript && inlineScript.dataset.attrName) {
       new root.Gister(inlineScript.dataset.attrName).fetch();
     }
