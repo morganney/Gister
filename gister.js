@@ -73,9 +73,8 @@
 
     // Private properties and/or methods.
     var w = window, d = document, me = this,
-      gistSelector = ['code[data-', dataAttrName, ']'].join(''),
-      // Convert hyphens "-" into camelCase.
-      dataSetName = dataAttrName.replace(/-([a-z])/g, function(l) {return l[1].toUpperCase();}),
+      attrName = 'data-' + dataAttrName,
+      gistSelector = ['code[', attrName, ']'].join(''),
       addGistCss = function(filename) {
         var link = d.createElement('link'),
           fn   = filename.indexOf('http') > -1 ? filename : 'https://gist-assets.github.com' + filename;
@@ -92,7 +91,7 @@
       mutationCallback = function() {
         // Convert NodeList into an Array of Nodes. Older versions of IE throw and error here.
         Array.prototype.slice.call(d.querySelectorAll(gistSelector)).forEach(function(el) {
-          fetch(el.dataset[dataSetName]).then(function(gist) {
+          fetch(el.getAttribute(attrName)).then(function(gist) {
             addGistCss(gist.stylesheet);
             el.innerHTML = gist.div;
             el.className = el.className + ' gisterComplete';
