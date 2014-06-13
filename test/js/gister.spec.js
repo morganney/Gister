@@ -3,11 +3,14 @@ mocha.setup('bdd');
 require.config({
   baseUrl: '.',
   paths: {
-    gister: '../gister'
+    gister: '../gister',
+    fixtures: 'js/lib/fixtures/fixtures'
   }
 });
 
-require(['gister'], function(Gister) {
+require(['gister', 'fixtures'], function(Gister, fixtures) {
+
+  fixtures.path = '/test/fixtures';
 
   describe('Gister', function() {
 
@@ -20,7 +23,7 @@ require(['gister'], function(Gister) {
     });
 
     if(typeof Promise === 'function') {
-      describe('#Constructor', function() {
+      describe('Constructor', function() {
 
         it('Should check for ES6 Promise support', function() {
           (function() {
@@ -41,6 +44,29 @@ require(['gister'], function(Gister) {
         });
 
       });
+
+      describe('#fetch', function() {
+
+        beforeEach(function() {
+          $('body').append("<code data-gist-id='11103140' id='targeted'></code>");
+        });
+
+        afterEach(function() {
+          $('#targeted').remove();
+        });
+
+        it('Should update targeted <code> elements already present in the DOM', function(done) {
+          new Gister('gist-id', function(el) {
+            el.className.should.match(/gisterComplete/);
+            el.innerHTML.should.not.be.empty;
+            done();
+          }).fetch();
+        });
+
+        it('Should execute any callback function passed to Gister constructor', function(done) {
+          new Gister('gist-id', function() { done() }).fetch();
+        });
+      });
     } else {
       it('Should not be tested further until ES6 Promise dependency met', function() {
         true;
@@ -56,7 +82,8 @@ require(['gister'], function(Gister) {
     }
   });
 
-  mocha.checkLeaks();
-  mocha.globals(['jQuery']);
-  mocha.run();
+  mocha.setup({
+    timeout: 3000,
+    ignoreLeaks: true // Gister creates global JSONP callbacks
+  }).run();
 });
