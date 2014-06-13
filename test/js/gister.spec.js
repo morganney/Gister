@@ -3,14 +3,11 @@ mocha.setup('bdd');
 require.config({
   baseUrl: '.',
   paths: {
-    gister: '../gister',
-    fixtures: 'js/lib/fixtures/fixtures'
+    gister: '../gister'
   }
 });
 
-require(['gister', 'fixtures'], function(Gister, fixtures) {
-
-  fixtures.path = '/test/fixtures';
+require(['gister'], function(Gister) {
 
   describe('Gister', function() {
 
