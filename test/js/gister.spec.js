@@ -99,6 +99,17 @@ require(['gister'], function(Gister) {
           setTimeout(function() { $('#observed').append("<code data-gist-id='11106519' id='targeted'></code>") }, 2000);
           this.clock.tick(2000);
         });
+
+        it('Should require MutationObserver as a dependency', function() {
+          var mo = window.MutationObserver;
+
+          $('#fixtures').append("<div id='observed'></div>");
+          window.MutationObserver = undefined;
+          (function() {
+            new Gister('test').observe('#observed');
+          }).should.throw(/browser\ doesn't\ support\ 'mutationobserver'/i);
+          window.MutationObserver = mo;
+        });
       });
 
       describe('#poll', function() {
@@ -108,7 +119,7 @@ require(['gister'], function(Gister) {
         });
 
         afterEach(function() {
-          //$('#fixtures').empty();
+          $('#fixtures').empty();
           this.clock.restore();
         });
 
@@ -118,7 +129,6 @@ require(['gister'], function(Gister) {
             el.className.should.match(/gisterComplete/);
             el.innerHTML.should.not.be.empty;
             done();
-            $('#fixtures').empty();
           }).poll('#polled');
           setTimeout(function() { $('#polled').append("<code data-gist-id='11120666' id='targeted'></code>") }, 2000);
           this.clock.tick(2000);
@@ -126,7 +136,7 @@ require(['gister'], function(Gister) {
 
         it('Should execute any callback function passed to Gister Constructor', function(done) {
           $('#fixtures').append("<div id='polled'></div>");
-          new Gister('gist-id', function() { done(); $('#fixtures').empty(); }).poll('#polled');
+          new Gister('gist-id', function() { done() }).poll('#polled');
           setTimeout(function() { $('#polled').append("<code data-gist-id='11120666' id='targeted'></code>") }, 2000);
           this.clock.tick(2000);
         });
