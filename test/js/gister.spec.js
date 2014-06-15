@@ -11,8 +11,6 @@ require(['gister'], function(Gister) {
 
   describe('Gister', function() {
 
-    this.timeout(5000);
-
     it('Should be defined globally when used with an inline <script> tag', function() {
       window.Gister.should.be.an.instanceof(Object).and.should.not.be.exactly(Gister);
     });
@@ -52,6 +50,8 @@ require(['gister'], function(Gister) {
 
       describe('#fetch', function() {
 
+        this.timeout(5000);
+
         afterEach(function() {
           $('#fixtures').empty();
         });
@@ -72,6 +72,8 @@ require(['gister'], function(Gister) {
       });
 
       describe('#observe', function() {
+
+        this.timeout(5000);
 
         beforeEach(function() {
           this.clock = sinon.useFakeTimers();
@@ -105,14 +107,21 @@ require(['gister'], function(Gister) {
 
           $('#fixtures').append("<div id='observed'></div>");
           window.MutationObserver = undefined;
-          (function() {
-            new Gister('test').observe('#observed');
-          }).should.throw(/browser\ doesn't\ support\ 'mutationobserver'/i);
-          window.MutationObserver = mo;
+          try {
+            (function() {
+              new Gister('test').observe('#observed');
+            }).should.throw(/browser\ doesn't\ support\ 'mutationobserver'/i);
+          } catch(e) {
+            throw e; // Let it be reported by the test driver
+          } finally {
+            window.MutationObserver = mo;
+          }
         });
       });
 
       describe('#poll', function() {
+
+        this.timeout(5000);
 
         beforeEach(function() {
           this.clock = sinon.useFakeTimers();
