@@ -41,7 +41,7 @@
    * @param {String:dataAttrName(req)} Required
    * @param {Function:callback} Optional callback invoked after embedding gist
    */
-  var	Gister = function(dataAttrName, callback) {
+   var Gister = function(dataAttrName, callback) {
 
     // Private properties and/or methods.
     var w = window;
