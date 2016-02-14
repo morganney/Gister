@@ -42,16 +42,14 @@
    * @param {Function:callback} Optional callback invoked after embedding gist
    */
    var Gister = function(dataAttrName, callback) {
-
-    // Private properties and/or methods.
     var w = window;
     var d = document;
     var me = this;
     var gistSelector = ['code[data-', dataAttrName, ']'].join('');
     var dataSetName = dataAttrName.replace(/-([a-z])/g, function(g) {return g[1].toUpperCase();});
-    var addGistCss = function(filename) {
+    var addGistCss = function(cssfile) {
       var link = d.createElement('link');
-      var fn = filename.indexOf('http') > -1 ? filename : 'https://gist-assets.github.com' + filename;
+      var fn = cssfile.indexOf('http') > -1 ? cssfile : 'https://gist-assets.github.com' + cssfile;
 
       link.type = 'text/css';
       link.rel = 'stylesheet';
@@ -63,7 +61,11 @@
       addGistCss = function() {};
     };
     var mutationCallback = function(mutations) {
-      var gistNodes = Array.prototype.slice.call(d.querySelectorAll(gistSelector));
+      var gistNodes = [];
+
+      try {
+        gistNodes = Array.prototype.slice.call(d.querySelectorAll(gistSelector));
+      } catch (err) { /* IE <= 8 (moving along ...) */ }
 
       gistNodes.forEach(function(el) {
         fetch(el.dataset[dataSetName]).then(function(gist) {
@@ -134,7 +136,7 @@
 
         /**
          * Add a timeout to defend against unkown network issues.
-         * Rejects the promise if GitHub takes 10 seconds to respond.
+         * Rejects the promise if GitHub takes 12 seconds to respond.
          *
          * Once a Promise is fulfilled or rejected its state won't change so
          * rejecting after some set time won't overwrite any previous state.
@@ -142,7 +144,7 @@
         setTimeout(function() {
           reject(new Error('The request to GitHub has timed out.'));
           // Bypass cleanup() to avoid any errors from a missing function reference.
-        }, 10000);
+        }, 12000);
 
         // Add the <script> to the DOM
         first.parentNode.insertBefore(s, first);
@@ -150,18 +152,16 @@
     }
 
     if(!(this instanceof Gister)) {
-      throw new TypeError("Failed to construct 'Gister': Use the 'new' operator.");
+      throw new TypeError("new Gister error: Use the 'new' operator.");
     }
 
     if(!dataAttrName) {
-      throw new Error("Failed to construct 'Gister': Provide a data attr. name for the gist container(s).");
+      throw new Error("new Gister error: Provide a dataAttrName parameter.");
     }
 
     if(!w.Promise) {
-      throw new Error("Failed to construct 'Gister': Your browser doesn't support 'Promise'.");
+      throw new Error("new Gister error: Your browser doesn't support 'Promise'.");
     }
-
-    // Protected properties and/or methods
 
     /**
      * Observes a DOM node for changes prior to embedding GitHub gists.
@@ -172,7 +172,7 @@
      * @param {String:selector} A Selectors API (Level 2) string
      */
     this.observe = function(selector) {
-      if(!observer) throw new Error("Your browser doesn't support 'MutationObserver'.");
+      if(!observer) throw new Error("Your browser doesn't support MutationObserver.");
       else observer.observe(d.querySelector(selector), { childList: true });
     };
 
@@ -182,15 +182,16 @@
      *
      * @param {String:selector} A Selectors API (Level 2) string
      */
-    this.poll = function(selector) {
+    this.poll = function(selector, duration) {
       var node = document.querySelector(selector);
+      var seconds = duration || 10;
       var start = new Date().getTime();
       var timer = undefined;
 
       (function recurse() {
         var elapsed = (new Date().getTime()) - start;
 
-        if(elapsed >= 10 * 1000) {
+        if(elapsed >= seconds * 1000) {
           clearTimeout(timer);
         } else if(node.querySelectorAll(gistSelector).length) {
           clearTimeout(timer);
@@ -199,7 +200,6 @@
           timer = setTimeout(recurse, 500);
         }
       }());
-
     };
 
     /**
@@ -209,7 +209,6 @@
     this.fetch = function() {
       mutationCallback();
     };
-
   };
 
   // Return the module definition.

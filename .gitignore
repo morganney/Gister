@@ -3,3 +3,5 @@
 /.idea_modules
 test/js/lib
 bower_components
+node_modules
+npm-debug.log

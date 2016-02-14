@@ -1,0 +1,31 @@
+{
+  "name": "gisted",
+  "version": "0.2.0",
+  "description": "Use GitHub Gists on your website",
+  "main": "gister.js",
+  "dependencies": {
+    "es6-promise": "3.1.2"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/morganney/Gister.git"
+  },
+  "keywords": [
+    "gists",
+    "github",
+    "website",
+    "code"
+  ],
+  "author": "Morgan Ney <morganney@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/morganney/Gister/issues"
+  },
+  "homepage": "https://github.com/morganney/Gister#readme"
+}
